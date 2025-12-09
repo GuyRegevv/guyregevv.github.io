@@ -2,8 +2,7 @@ import Experience from "./Experience";
 
 export default function Employment() {
     return (
-        <div className="flex flex-col h-screen overflow-hidden justify-between pr-12 pb-8">
-            <div className="flex-1" />
+        <div className="flex flex-col h-full justify-end pr-12">
             <Experience />
         </div>
     );

@@ -18,7 +18,7 @@ export default function Detect() {
                     It began as a fun side project to explore AI models and experiment with what real-time, in-browser AI is capable of.
                 </p>
 
-                <div className="flex flex-col items-center my-20">
+                <div className="flex flex-col items-center my-8">
                     <img 
                         src="/Detect.gif" 
                         alt="Detect The Cat demo" 

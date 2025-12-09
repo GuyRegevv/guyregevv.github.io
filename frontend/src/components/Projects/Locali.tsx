@@ -40,7 +40,7 @@ export default function Locali() {
                     </p>                
                 </div>
             </div>
-            <div className="grid grid-cols-2 grid-rows-2 gap-4 w-full max-w-3xl mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-w-3xl mx-auto pb-4">
                 {images.map((img, i) => (
                     <button
                         key={i}

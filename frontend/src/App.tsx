@@ -35,7 +35,7 @@ export default function App() {
           </div>
         </div>
 
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-h-0">
           {page === "about" && <About />}
           {page === "experience" && <Employment />}
           {page === "projects" && <Projects selectedProject={selectedProject} />}
