@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Noise Background</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #02030a; /* fallback */
+    }
+    #bg-container {
+      position: fixed;
+      inset: 0;
+      z-index: -1; /* sits behind your content */
+    }
+  </style>
+</head>
+<body>
+  <div id="bg-container"></div>
+
+  <!-- Your normal site content would go here -->
+  <!-- <div id="app">...</div> -->
+
+  <script type="module">
+    import * as THREE from 'https://unpkg.com/three@0.165.0/build/three.module.js';
+
+    // === Setup ===
+    const container = document.getElementById('bg-container');
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: false });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    container.appendChild(renderer.domElement);
+
+    // === Shader ===
+    const uniforms = {
+      u_time: { value: 0.0 },
+      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+    };
+
+    const vertexShader = `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = vec4(position, 1.0);
+      }
+    `;
+
+    // Simple hash noise + animation
+    const fragmentShader = `
+      precision highp float;
+
+      uniform float u_time;
+      uniform vec2 u_resolution;
+      varying vec2 vUv;
+
+      float hash(vec2 p) {
+        // cheap pseudo-random
+        p = vec2(dot(p, vec2(127.1, 311.7)),
+                 dot(p, vec2(269.5, 183.3)));
+        return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
+      }
+
+      float noise(vec2 p) {
+        vec2 i = floor(p);
+        vec2 f = fract(p);
+
+        float a = hash(i);
+        float b = hash(i + vec2(1.0, 0.0));
+        float c = hash(i + vec2(0.0, 1.0));
+        float d = hash(i + vec2(1.0, 1.0));
+
+        vec2 u = f * f * (3.0 - 2.0 * f);
+
+        return mix(a, b, u.x) +
+               (c - a) * u.y * (1.0 - u.x) +
+               (d - b) * u.x * u.y;
+      }
+
+      void main() {
+        vec2 uv = vUv;
+
+        // scale controls grain size
+        float scale = 400.0;
+        vec2 p = uv * scale;
+
+        // animate by shifting p over time
+        float t = u_time * 0.8;
+        float n = noise(p + vec2(t, -t));
+
+        // base color (dark) + noise on top
+        float brightness = 0.1 + n * 0.15;
+
+        vec3 baseColor = vec3(0.02, 0.02, 0.04); // almost black blue
+        vec3 color = baseColor + vec3(brightness);
+
+        // slight vignette
+        vec2 center = uv - 0.5;
+        float vignette = 1.0 - dot(center, center) * 1.5;
+        color *= vignette;
+
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `;
+
+    const material = new THREE.ShaderMaterial({
+      uniforms,
+      vertexShader,
+      fragmentShader
+    });
+
+    const geometry = new THREE.PlaneGeometry(2, 2);
+    const mesh = new THREE.Mesh(geometry, material);
+    scene.add(mesh);
+
+    // === Resize handling ===
+    window.addEventListener('resize', () => {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+    });
+
+    // === Animation loop ===
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      uniforms.u_time.value = clock.getElapsedTime();
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
