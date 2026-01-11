@@ -14,7 +14,7 @@ type Props = {
   export default function Sidebar({ currentPage, onChangePage, onSelectProject, selectedProject }: Props) {
     return (
       <div className="h-full w-full border-4-px border-slate-700">
-        <div className="relative w-fit flex flex-col gap-4 font-medium mr-32">
+        <div className="relative w-fit flex flex-col gap-4 font-medium mr-8 lg:mr-32">
           
           <button
             className={`${buttonBaseClass} ${currentPage === "about" ? buttonSelectedClass : buttonUnselectedClass}`}

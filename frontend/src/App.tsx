@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import Sidebar from "./components/Sidebar";
+import MobileNav from "./components/MobileNav";
 import About from "./components/About";
 import Employment from "./components/Employment";
 import Title from "./components/Title";
@@ -14,14 +15,22 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState<string>("Locali");
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden">      
-      <div className="relative flex h-screen text-white p-8 bg-mossy-dark overflow-x-hidden">
-        <div className="flex flex-col w-1/2 h-full">
-          <div className="flex-none pl-12 h-64 w-full flex items-center">
+    <div className="min-h-screen w-full overflow-x-hidden">
+      <div className="relative flex flex-col lg:flex-row min-h-screen lg:h-screen text-white p-4 md:p-8 bg-mossy-dark overflow-x-hidden">
+        <div className="flex flex-col w-full lg:w-1/2 lg:h-full">
+          <div className="flex-none pl-4 md:pl-12 h-24 md:h-32 lg:h-64 w-full flex items-center justify-between">
             <Title />
+            <div className="pr-4 md:pr-0">
+              <MobileNav
+                currentPage={page}
+                onChangePage={(p: string) => setPage(p as Page)}
+                onSelectProject={(p: string) => setSelectedProject(p)}
+                selectedProject={selectedProject}
+              />
+            </div>
           </div>
 
-          <div className="flex-1 overflow-y-auto p-12">
+          <div className="hidden lg:flex flex-1 lg:overflow-y-auto p-4 md:p-12">
             <Sidebar
               currentPage={page}
               onChangePage={(p: string) => setPage(p as Page)}
@@ -30,15 +39,17 @@ export default function App() {
             />
           </div>
 
-          <div className="flex-none p-12 h-12 w-full flex items-center">
+          <div className="flex-none p-4 md:p-12 h-12 w-full flex items-center">
             <ContactInfo />
           </div>
         </div>
 
-        <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-col flex-1 min-h-0 mt-4 lg:mt-0">
           {page === "about" && <About />}
           {page === "experience" && <Employment />}
-          {page === "projects" && <Projects selectedProject={selectedProject} />}
+          {page === "projects" && (
+            <Projects selectedProject={selectedProject} />
+          )}
         </div>
       </div>
     </div>
